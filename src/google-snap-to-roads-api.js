@@ -24,19 +24,18 @@ const snapToRoads = (params) => {
   // 100 coordinates per segment
   let segmentedCoordinates = [];
 
-  coordinates.forEach((coordinate) => {
+  coordinates.forEach((coordinate, index) => {
     segmentedCoordinates.push(coordinate);
 
-    if (segmentedCoordinates.length >= MAX_POINTS_PER_REQUEST) {
+    if (
+      segmentedCoordinates.length >= MAX_POINTS_PER_REQUEST ||
+      index + MAX_POINTS_PER_REQUEST >= coordinates.length
+    ) {
       const path = segmentedCoordinates.join('|');
       segmentedCoordinates = [];
       snapToRoadsPromises.push(fetchSnapPoints({ ...params, path }));
     }
   });
-  if (segmentedCoordinates.length !== 0) {
-    const path = segmentedCoordinates.join('|');
-    snapToRoadsPromises.push(fetchSnapPoints({ ...params, path }));
-  }
 
   return Promise.all(snapToRoadsPromises).then((results) => {
     const allSnappedPoints = [];
